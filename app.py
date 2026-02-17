@@ -772,7 +772,7 @@ elif current_page == "📄 Executive Summary":
     grade = scorecard_result["grade"]
     grade_color = scorecard_result["grade_color"]
     total_score = scorecard_result["total_score"]
-    z_val = z_result.get("z_score", 0)
+    z_val = z_result.get("z_score") or 0
     z_zone = z_result.get("zone", "N/A")
 
     # Revenue growth
@@ -782,11 +782,11 @@ elif current_page == "📄 Executive Summary":
     else:
         rev_growth = 0
 
-    gm = ratio_engine.gross_margin(latest)
-    nm = ratio_engine.net_margin(latest)
-    cr = ratio_engine.current_ratio(latest)
-    de = ratio_engine.debt_to_equity(latest)
-    ic = ratio_engine.interest_coverage(latest)
+    gm = ratio_engine.gross_margin(latest) or 0
+    nm = ratio_engine.net_margin(latest) or 0
+    cr = ratio_engine.current_ratio(latest) or 0
+    de = ratio_engine.debt_to_equity(latest) or 0
+    ic = ratio_engine.interest_coverage(latest) or 0
 
     # ── Report ────────────────────────────────────────────────────────────
     st.markdown(f"""
@@ -800,7 +800,10 @@ elif current_page == "📄 Executive Summary":
                 </div>
             </div>
             <div style="text-align:center;">
-                {render_grade_badge(grade, grade_color, 70)}
+                <span style="display:inline-flex; align-items:center; justify-content:center;
+                    width:70px; height:70px; font-size:24px; font-weight:900;
+                    border:3px solid {grade_color}; border-radius:50%; color:{grade_color};
+                    background:rgba({_hex_to_rgb(grade_color)}, 0.1);">{grade}</span>
             </div>
         </div>
 
