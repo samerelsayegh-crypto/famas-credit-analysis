@@ -789,10 +789,10 @@ elif current_page == "📄 Executive Summary":
     ic = ratio_engine.interest_coverage(latest) or 0
 
     # ── Report ────────────────────────────────────────────────────────────
-    st.markdown(f"""
-    <div class="glass-panel">
+    # ── Header ─────────────────────────────────────────────────────────
+    st.markdown(f"""<div class="glass-panel">
         <h3>📋 Credit Analysis Report</h3>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid rgba(212,168,67,0.15);">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:16px; border-bottom:1px solid rgba(212,168,67,0.15);">
             <div>
                 <div style="font-size:1.3rem; font-weight:700; color:#e8e8e8;">{display_name}</div>
                 <div style="color:rgba(232,232,232,0.5); font-size:0.85rem;">
@@ -806,49 +806,72 @@ elif current_page == "📄 Executive Summary":
                     background:rgba({_hex_to_rgb(grade_color)}, 0.1);">{grade}</span>
             </div>
         </div>
+    </div>""", unsafe_allow_html=True)
 
-        <div style="color:#e8e8e8; font-size:0.9rem; line-height:1.8;">
-            <p><b style="color:#d4a843;">Overview:</b>
-                {"The company" if not company_name else company_name} reported revenue of
-                <b>{format_number(rev, "$")}</b> for fiscal year {latest}, representing a
-                <b>{rev_growth:+.1f}%</b> year-over-year {"increase" if rev_growth >= 0 else "decline"}.
-                Net income was <b>{format_number(ni, "$")}</b>, translating to a net margin of
-                <b>{nm*100:.1f}%</b>.
-            </p>
+    # ── Overview ──────────────────────────────────────────────────────
+    company_label = company_name if company_name else "The company"
+    overview_commentary = "increase" if rev_growth >= 0 else "decline"
+    st.markdown(f"""<div style="color:#e8e8e8; font-size:0.9rem; line-height:1.8; padding:0 16px;">
+        <p><b style="color:#d4a843;">Overview:</b>
+            {company_label} reported revenue of
+            <b>{format_number(rev, "$")}</b> for fiscal year {latest}, representing a
+            <b>{rev_growth:+.1f}%</b> year-over-year {overview_commentary}.
+            Net income was <b>{format_number(ni, "$")}</b>, translating to a net margin of
+            <b>{nm*100:.1f}%</b>.
+        </p>
+    </div>""", unsafe_allow_html=True)
 
-            <p><b style="color:#d4a843;">Profitability:</b>
-                Gross margin stands at <b>{gm*100:.1f}%</b>
-                {"which is healthy and indicates strong pricing power." if gm and gm > 0.30 else "which suggests moderate cost pressure." if gm and gm > 0.15 else "which indicates significant cost pressure."}
-                Net profitability is {"strong" if nm and nm > 0.10 else "adequate" if nm and nm > 0.03 else "weak"}.
-            </p>
+    # ── Profitability ─────────────────────────────────────────────────
+    gm_comment = "which is healthy and indicates strong pricing power." if gm > 0.30 else "which suggests moderate cost pressure." if gm > 0.15 else "which indicates significant cost pressure."
+    nm_comment = "strong" if nm > 0.10 else "adequate" if nm > 0.03 else "weak"
+    st.markdown(f"""<div style="color:#e8e8e8; font-size:0.9rem; line-height:1.8; padding:0 16px;">
+        <p><b style="color:#d4a843;">Profitability:</b>
+            Gross margin stands at <b>{gm*100:.1f}%</b>
+            {gm_comment}
+            Net profitability is {nm_comment}.
+        </p>
+    </div>""", unsafe_allow_html=True)
 
-            <p><b style="color:#d4a843;">Balance Sheet:</b>
-                Total assets are <b>{format_number(ta, "$")}</b> with total equity of <b>{format_number(equity, "$")}</b>.
-                The debt-to-equity ratio is <b>{de:.2f}x</b>
-                {"— indicating conservative leverage." if de and de < 1.0 else "— indicating moderate leverage." if de and de < 2.0 else "— indicating elevated leverage that warrants monitoring."}
-            </p>
+    # ── Balance Sheet ─────────────────────────────────────────────────
+    de_comment = "— indicating conservative leverage." if de < 1.0 else "— indicating moderate leverage." if de < 2.0 else "— indicating elevated leverage that warrants monitoring."
+    st.markdown(f"""<div style="color:#e8e8e8; font-size:0.9rem; line-height:1.8; padding:0 16px;">
+        <p><b style="color:#d4a843;">Balance Sheet:</b>
+            Total assets are <b>{format_number(ta, "$")}</b> with total equity of <b>{format_number(equity, "$")}</b>.
+            The debt-to-equity ratio is <b>{de:.2f}x</b>
+            {de_comment}
+        </p>
+    </div>""", unsafe_allow_html=True)
 
-            <p><b style="color:#d4a843;">Liquidity:</b>
-                The current ratio is <b>{cr:.2f}x</b>
-                {"which is strong, indicating comfortable short-term liquidity." if cr and cr > 1.5 else "which is adequate." if cr and cr > 1.0 else "which is concerning and may indicate liquidity stress."}
-                Working capital is <b>{format_number(wc, "$")}</b>.
-            </p>
+    # ── Liquidity ─────────────────────────────────────────────────────
+    cr_comment = "which is strong, indicating comfortable short-term liquidity." if cr > 1.5 else "which is adequate." if cr > 1.0 else "which is concerning and may indicate liquidity stress."
+    st.markdown(f"""<div style="color:#e8e8e8; font-size:0.9rem; line-height:1.8; padding:0 16px;">
+        <p><b style="color:#d4a843;">Liquidity:</b>
+            The current ratio is <b>{cr:.2f}x</b>
+            {cr_comment}
+            Working capital is <b>{format_number(wc, "$")}</b>.
+        </p>
+    </div>""", unsafe_allow_html=True)
 
-            <p><b style="color:#d4a843;">Coverage:</b>
-                Interest coverage stands at <b>{ic:.1f}x</b>
-                {"— very comfortable coverage of debt obligations." if ic and ic > 3.0 else "— adequate but should be monitored." if ic and ic > 1.5 else "— concerning. The company may struggle to service its debt."}
-            </p>
+    # ── Coverage ──────────────────────────────────────────────────────
+    ic_comment = "— very comfortable coverage of debt obligations." if ic > 3.0 else "— adequate but should be monitored." if ic > 1.5 else "— concerning. The company may struggle to service its debt."
+    st.markdown(f"""<div style="color:#e8e8e8; font-size:0.9rem; line-height:1.8; padding:0 16px;">
+        <p><b style="color:#d4a843;">Coverage:</b>
+            Interest coverage stands at <b>{ic:.1f}x</b>
+            {ic_comment}
+        </p>
+    </div>""", unsafe_allow_html=True)
 
-            <p><b style="color:#d4a843;">Credit Assessment:</b>
-                The overall credit score is <b>{total_score:.0f}/100</b>, corresponding to a
-                <b style="color:{grade_color};">{grade}</b> rating.
-                The Altman Z-Score is <b>{z_val:.2f}</b>, placing the company in the
-                <b>{z_zone}</b>.
-                {"This suggests a low probability of financial distress." if z_zone == "Safe Zone" else "Continued monitoring is recommended." if z_zone == "Grey Zone" else "Immediate attention is warranted to address financial distress indicators."}
-            </p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # ── Credit Assessment ─────────────────────────────────────────────
+    z_comment = "This suggests a low probability of financial distress." if z_zone == "Safe Zone" else "Continued monitoring is recommended." if z_zone == "Grey Zone" else "Immediate attention is warranted to address financial distress indicators."
+    st.markdown(f"""<div style="color:#e8e8e8; font-size:0.9rem; line-height:1.8; padding:0 16px;">
+        <p><b style="color:#d4a843;">Credit Assessment:</b>
+            The overall credit score is <b>{total_score:.0f}/100</b>, corresponding to a
+            <b style="color:{grade_color};">{grade}</b> rating.
+            The Altman Z-Score is <b>{z_val:.2f}</b>, placing the company in the
+            <b>{z_zone}</b>.
+            {z_comment}
+        </p>
+    </div>""", unsafe_allow_html=True)
 
     # ── Risk Flags ────────────────────────────────────────────────────────
     flags = scorecard_result.get("flags", [])
